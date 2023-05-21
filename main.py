@@ -39,7 +39,24 @@ from data_structure.stack import Stack
 # Реализуйте метод to_postfix класса ExpressionConverter в файле
 # expression.py и протестируйте класс Expression.
 
+# Дополнительное задание 1.
+# Стандартный алгоритм перевода из инфиксной формы в постфиксную
+# форму записи не учитывает, что в выражении могут участвовать
+# отрицательные числа. Напишите метод, который приводит инфиксную форму
+# к виду пригодному для перевода в постфиксную форму. Отрицательные числа
+# в арифметическом выражение заключаются в круглые скобки, кроме случая
+# когда выражение начинается с отрицательного значения.
+
+# Дополнительное задание 2.
+# Напишите метод, который проверяет, правильно ли расставлены скобки
+# внутри инфиксной записи арифметического выражения.
+
 class ExpressionValueError(Exception):
+    def __init__(self, text: str):
+        self.text = text
+
+
+class BracketError(Exception):
     def __init__(self, text: str):
         self.text = text
 
@@ -75,11 +92,59 @@ class ExpressionConverter:
         return res_str
 
     @staticmethod
+    def __check_brackets(expression: str) -> bool:
+        """
+        Проверяет математическое выражение на правильность расстановки круглых скобок.
+        :param expression: str: строка, математическое выражение.
+        :return:
+            True: скобки расставлены корректно.
+            False: скобки расставлены не корректно.
+        """
+        brackets = {
+            "(": ")",
+        }
+        stack = Stack()
+        for symbol in expression:
+            if symbol in brackets.keys():
+                stack.push(symbol)
+            elif not stack.is_empty() and symbol == brackets[stack.peek()]:
+                stack.pop()
+            elif symbol.isdigit() or symbol in "+-*/ ":
+                continue
+            else:
+                return False
+
+        if stack.is_empty():
+            return True
+        return False
+
+    @staticmethod
+    def __modification_expression(expression: str) -> str:
+        """
+        Вставляет символы пробелов между операндами и знаками операций.
+        :param expression: str: строка, математическое выражение.
+        :return:
+            str: строка, математическое выражение с расставленными символами пробелов.
+        """
+        res_str = ""
+        for symbol in expression:
+            if symbol.isdigit():
+                res_str += symbol
+            elif symbol in "+-*/()":
+                res_str += " " + symbol + " "
+        return res_str
+
+    @staticmethod
     def to_postfix(expression: str) -> list:
         result_str = ""
         stack = Stack()
-        expression = ExpressionConverter.__normalize_infix_expression(expression)
-        operation_value = ExpressionConverter.operation_priority
+        check_brackets = ExpressionConverter.__check_brackets(expression)
+        if check_brackets:
+            expression = ExpressionConverter.__normalize_infix_expression(expression)
+            expression = ExpressionConverter.__modification_expression(expression)
+            operation_value = ExpressionConverter.operation_priority
+        else:
+            raise BracketError(f"Не корректно расставлены скобки в выражении: {expression}.")
         for symbol in expression:
             # 1.1. Если прочитан операнд (число), записать его в выходную
             # последовательность
@@ -94,10 +159,11 @@ class ExpressionConverter:
             # уничтожаются.
             elif symbol == ")":
                 while stack.peek() != "(":
-                    result_str += stack.peek()
+                    result_str += " " + stack.peek()
                     stack.pop()
                 stack.pop()
-
+            elif symbol == " ":
+                result_str += symbol
             # 1.4. Если прочитан знак операции, вытолкнуть из стека в выходную
             # последовательность все операции с большим либо равным приоритетом, а
             # прочитанную операцию положить в стек.
@@ -106,7 +172,7 @@ class ExpressionConverter:
                     stack.push(symbol)
                 elif operation_value[symbol] <= operation_value[stack.peek()]:
                     while not stack.is_empty() and operation_value[stack.peek()] >= operation_value[symbol]:
-                        result_str += stack.peek()
+                        result_str += " " + stack.peek()
                         stack.pop()
                     stack.push(symbol)
                 else:
@@ -115,7 +181,7 @@ class ExpressionConverter:
         # 2. Если достигнут конец входной последовательности, вытолкнуть все
         # из стека в выходную последовательность и завершить работу.
         while len(stack) != 0:
-            result_str += stack.pop()
+            result_str += " " + stack.pop()
         return result_str.split()
 
 
@@ -142,11 +208,12 @@ class Expression:
 
 
 def execute_application():
-    expression_str = "-8+(-3)*(-2)+(-7)*(-6+3*(-4))"
+    expression_str = "-80+(-3)*(-20)+(-7000)*(-6+3*(-4))"
+
     try:
         postfix_list = ExpressionConverter.to_postfix(expression_str)
         print(postfix_list)
-    except ExpressionValueError as e:
+    except (BracketError, ExpressionValueError) as e:
         print(e)
 
 
