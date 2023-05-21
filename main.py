@@ -39,6 +39,10 @@ from data_structure.stack import Stack
 # Реализуйте метод to_postfix класса ExpressionConverter в файле
 # expression.py и протестируйте класс Expression.
 
+class ExpressionValueError(Exception):
+    def __init__(self, text: str):
+        self.text = text
+
 
 class ExpressionConverter:
     operation_priority = {
@@ -52,24 +56,36 @@ class ExpressionConverter:
     @staticmethod
     def __normalize_infix_expression(expression: str) -> str:
         """
-        Метод который учитывает отрицательные значения и приводит инфиксную
-        запись выражения к виду пригодному для перевода в постфиксную запись
-        :param expression:
+        Метод, который учитывает отрицательные значения и приводит инфиксную
+        запись выражения к виду пригодному для перевода в постфиксную запись.
+        :param expression: str: выражение в строковом представлении.
         :return:
+            str: строка представленная в инфиксной записи, в пригодном виде, для работы с отрицательными числами.
         """
-        pass
+        res_str = ""
+        for i, symbol in enumerate(expression):
+            if not symbol.isdigit() and symbol not in "+-*/() ":
+                raise ExpressionValueError(f"Не корректный символ {symbol}, в выражении {expression}")
+            if i == 0 and symbol == "-":
+                res_str += "0-"
+            elif i < len(expression) - 1 and symbol == "(" and expression[i + 1] == "-":
+                res_str += "(0"
+            else:
+                res_str += symbol
+        return res_str
 
     @staticmethod
     def to_postfix(expression: str) -> list:
         result_str = ""
         stack = Stack()
+        expression = ExpressionConverter.__normalize_infix_expression(expression)
         operation_value = ExpressionConverter.operation_priority
         for symbol in expression:
-            # print(symbol)
             # 1.1. Если прочитан операнд (число), записать его в выходную
             # последовательность
             if symbol.isdigit():
                 result_str += symbol
+
             # 1.2. Если прочитана открывающая скобка, положить ее в стек.
             elif symbol == "(":
                 stack.push(symbol)
@@ -81,19 +97,21 @@ class ExpressionConverter:
                     result_str += stack.peek()
                     stack.pop()
                 stack.pop()
+
             # 1.4. Если прочитан знак операции, вытолкнуть из стека в выходную
             # последовательность все операции с большим либо равным приоритетом, а
             # прочитанную операцию положить в стек.
             elif symbol in "+-*/":
                 if len(stack) == 0:
                     stack.push(symbol)
-                elif not stack.is_empty() and operation_value[symbol] <= operation_value[stack.peek()]:
+                elif operation_value[symbol] <= operation_value[stack.peek()]:
                     while not stack.is_empty() and operation_value[stack.peek()] >= operation_value[symbol]:
                         result_str += stack.peek()
                         stack.pop()
                     stack.push(symbol)
                 else:
                     stack.push(symbol)
+
         # 2. Если достигнут конец входной последовательности, вытолкнуть все
         # из стека в выходную последовательность и завершить работу.
         while len(stack) != 0:
@@ -124,9 +142,12 @@ class Expression:
 
 
 def execute_application():
-    expression_str = "8+3*2+7*(6+3*4)"
-    postfix_list = ExpressionConverter.to_postfix(expression_str)
-    print(postfix_list)
+    expression_str = "-8+(-3)*(-2)+(-7)*(-6+3*(-4))"
+    try:
+        postfix_list = ExpressionConverter.to_postfix(expression_str)
+        print(postfix_list)
+    except ExpressionValueError as e:
+        print(e)
 
 
 if __name__ == '__main__':
