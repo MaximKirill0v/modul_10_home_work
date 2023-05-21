@@ -1,3 +1,6 @@
+from data_structure.stack import Stack
+
+
 # Задание 1.
 # Перевести выражение из инфиксной формы в постфиксную форму
 # записи.
@@ -58,7 +61,44 @@ class ExpressionConverter:
 
     @staticmethod
     def to_postfix(expression: str) -> list:
-        pass
+        result_str = ""
+        stack = Stack()
+        operation_value = ExpressionConverter.operation_priority
+        for symbol in expression:
+            # print(symbol)
+            # 1.1. Если прочитан операнд (число), записать его в выходную
+            # последовательность
+            if symbol.isdigit():
+                result_str += symbol
+            # 1.2. Если прочитана открывающая скобка, положить ее в стек.
+            elif symbol == "(":
+                stack.push(symbol)
+            # 1.3. Если прочитана закрывающая скобка, вытолкнуть из стека в
+            # выходную последовательность все до открывающей скобки. Сами скобки
+            # уничтожаются.
+            elif symbol == ")":
+                while stack.peek() != "(":
+                    result_str += stack.peek()
+                    stack.pop()
+                stack.pop()
+            # 1.4. Если прочитан знак операции, вытолкнуть из стека в выходную
+            # последовательность все операции с большим либо равным приоритетом, а
+            # прочитанную операцию положить в стек.
+            elif symbol in "+-*/":
+                if len(stack) == 0:
+                    stack.push(symbol)
+                elif not stack.is_empty() and operation_value[symbol] <= operation_value[stack.peek()]:
+                    while not stack.is_empty() and operation_value[stack.peek()] >= operation_value[symbol]:
+                        result_str += stack.peek()
+                        stack.pop()
+                    stack.push(symbol)
+                else:
+                    stack.push(symbol)
+        # 2. Если достигнут конец входной последовательности, вытолкнуть все
+        # из стека в выходную последовательность и завершить работу.
+        while len(stack) != 0:
+            result_str += stack.pop()
+        return result_str.split()
 
 
 class Expression:
@@ -84,7 +124,9 @@ class Expression:
 
 
 def execute_application():
-    pass
+    expression_str = "8+3*2+7*(6+3*4)"
+    postfix_list = ExpressionConverter.to_postfix(expression_str)
+    print(postfix_list)
 
 
 if __name__ == '__main__':
