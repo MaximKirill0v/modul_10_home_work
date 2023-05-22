@@ -216,7 +216,7 @@ class Expression:
 def execute_application():
     try:
         expression = Expression("-80+(-3)*(-20)+(-7000)*(-6+3*(-4))")
-        print(expression.postfix_expression)
+        print(f"Выражение '{expression.infix_expression}' в постфиксной записи имеет вид:\n{expression.postfix_expression}")
     except (ExpressionValueError, BracketError) as e:
         print(e)
 
