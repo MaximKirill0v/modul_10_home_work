@@ -92,19 +92,21 @@ class ExpressionConverter:
         return res_str
 
     @staticmethod
-    def __check_brackets(expression: str) -> bool:
+    def __check_expression(expression: str) -> bool:
         """
-        Проверяет математическое выражение на правильность расстановки круглых скобок.
+        Проверяет математическое выражение на корректность ввода.
         :param expression: str: строка, математическое выражение.
         :return:
-            True: скобки расставлены корректно.
-            False: скобки расставлены не корректно.
+            True: выражение корректно.
+            False: выражение не корректно.
         """
         brackets = {
             "(": ")",
         }
         stack = Stack()
         for symbol in expression:
+            if not symbol.isdigit() and symbol not in "+-*/() ":
+                raise ExpressionValueError(f"Не корректный символ {symbol}, в выражении {expression}")
             if symbol in brackets.keys():
                 stack.push(symbol)
             elif not stack.is_empty() and symbol == brackets[stack.peek()]:
@@ -138,9 +140,12 @@ class ExpressionConverter:
     def to_postfix(expression: str) -> list:
         result_str = ""
         stack = Stack()
-        check_brackets = ExpressionConverter.__check_brackets(expression)
-        if check_brackets:
+        # проверка на корректность выражения.
+        check_expression = ExpressionConverter.__check_expression(expression)
+        if check_expression:
+            # учитываем отрицательные числа.
             expression = ExpressionConverter.__normalize_infix_expression(expression)
+            # Вставляет символы пробелов между операндами и знаками операций
             expression = ExpressionConverter.__modification_expression(expression)
             operation_value = ExpressionConverter.operation_priority
         else:
@@ -203,17 +208,16 @@ class Expression:
         '''
         Возвращает значение выражения, записанного в постфиксной форме в поле __postfix_expression
         :return:
+            float: результат математического выражения.
         '''
         pass
 
 
 def execute_application():
-    expression_str = "-80+(-3)*(-20)+(-7000)*(-6+3*(-4))"
-
     try:
-        postfix_list = ExpressionConverter.to_postfix(expression_str)
-        print(postfix_list)
-    except (BracketError, ExpressionValueError) as e:
+        expression = Expression("-80+(-3)*(-20)+(-7000)*(-6+3*(-4))")
+        print(expression.postfix_expression)
+    except (ExpressionValueError, BracketError) as e:
         print(e)
 
 
