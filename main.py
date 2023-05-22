@@ -78,37 +78,6 @@ class ExpressionConverter:
         return res_str
 
     @staticmethod
-    def __check_expression(expression: str) -> bool:
-        """
-        Проверяет математическое выражение на корректность ввода.
-        :param expression: str: строка, математическое выражение.
-        :return:
-            True: выражение корректно.
-            False: выражение не корректно.
-        """
-        brackets = {
-            "(": ")",
-        }
-        stack = Stack()
-        for i, symbol in enumerate(expression):
-            if not symbol.isdigit() and symbol not in "+-*/() ":
-                raise ExpressionValueError(f"Не корректный символ {symbol}, в выражении {expression}")
-            if symbol in "+-*/" and expression[i + 1] in "+-*/" and i != len(expression) - 1:
-                raise ExpressionValueError(f"Выражение {expression} не корректно.")
-            if symbol in brackets.keys():
-                stack.push(symbol)
-            elif not stack.is_empty() and symbol == brackets[stack.peek()]:
-                stack.pop()
-            elif symbol.isdigit() or symbol in "+-*/ ":
-                continue
-            else:
-                return False
-
-        if stack.is_empty():
-            return True
-        return False
-
-    @staticmethod
     def __modification_expression(expression: str) -> str:
         """
         Вставляет символы пробелов между операндами и знаками операций.
@@ -128,16 +97,11 @@ class ExpressionConverter:
     def to_postfix(expression: str) -> list:
         result_str = ""
         stack = Stack()
-        # проверка на корректность выражения.
-        check_expression = ExpressionConverter.__check_expression(expression)
-        if check_expression:
-            # учитываем отрицательные числа.
-            expression = ExpressionConverter.__normalize_infix_expression(expression)
-            # Вставляет символы пробелов между операндами и знаками операций
-            expression = ExpressionConverter.__modification_expression(expression)
-            operation_value = ExpressionConverter.operation_priority
-        else:
-            raise BracketError(f"Не корректно расставлены скобки в выражении: {expression}.")
+        # учитываем отрицательные числа.
+        expression = ExpressionConverter.__normalize_infix_expression(expression)
+        # Вставляет символы пробелов между операндами и знаками операций
+        expression = ExpressionConverter.__modification_expression(expression)
+        operation_value = ExpressionConverter.operation_priority
         for symbol in expression:
             # 1.1. Если прочитан операнд (число), записать его в выходную
             # последовательность
@@ -184,6 +148,43 @@ class Expression:
         self.__infix_expression = expression
         self.__postfix_expression = ExpressionConverter.to_postfix(expression)
 
+    @staticmethod
+    def __is_valid_expression(expression: str) -> bool:
+        """
+        Проверяет математическое выражение на корректность ввода.
+        :param expression: str: строка, математическое выражение.
+        :return:
+            True: выражение корректно.
+            False: выражение не корректно.
+        """
+        brackets = {
+            "(": ")",
+        }
+        stack = Stack()
+        for i, symbol in enumerate(expression):
+            if not symbol.isdigit() and symbol not in "+-*/() ":
+                raise ExpressionValueError(f"Не корректный символ {symbol}, в выражении {expression}")
+            if symbol in "+-*/" and expression[i + 1] in "+-*/" and i != len(expression) - 1:
+                return False
+            if symbol in brackets.keys():
+                stack.push(symbol)
+            elif not stack.is_empty() and symbol == brackets[stack.peek()]:
+                stack.pop()
+            elif symbol.isdigit() or symbol in "+-*/ ":
+                continue
+            else:
+                return False
+
+        if stack.is_empty():
+            return True
+        raise BracketError(f"Не корректно расставлены скобки в выражении {expression}")
+
+    def __setattr__(self, key, value):
+        if key == "_Expression__infix_expression" and not self.__is_valid_expression(value):
+            raise ExpressionValueError(f"Выражение: {value} записано не корректно.")
+        else:
+            object.__setattr__(self, key, value)
+
     @property
     def infix_expression(self):
         return self.__infix_expression
@@ -221,9 +222,13 @@ class Expression:
 def execute_application():
     try:
         expression_1 = Expression("-8 - 3 * (-2) - 7 * (-6 - 3 * (-4))")
+        expression_2 = Expression("8 + 3 * 2 + 7 * (6 + 3 * 4)")
         print(f"Выражение: {expression_1.infix_expression} в постфиксной записи имеет вид:",
               *expression_1.postfix_expression)
         print(f"Выражение: {expression_1.infix_expression} = {expression_1.get_expression_value()}")
+        print(f"\nВыражение: {expression_2.infix_expression} в постфиксной записи имеет вид:",
+              *expression_2.postfix_expression)
+        print(f"Выражение: {expression_2.infix_expression} = {expression_2.get_expression_value()}")
     except (ExpressionValueError, BracketError) as e:
         print(e)
 
