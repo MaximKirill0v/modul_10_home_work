@@ -90,9 +90,11 @@ class ExpressionConverter:
             "(": ")",
         }
         stack = Stack()
-        for symbol in expression:
+        for i, symbol in enumerate(expression):
             if not symbol.isdigit() and symbol not in "+-*/() ":
                 raise ExpressionValueError(f"Не корректный символ {symbol}, в выражении {expression}")
+            if symbol in "+-*/" and expression[i + 1] in "+-*/" and i != len(expression) - 1:
+                raise ExpressionValueError(f"Выражение {expression} не корректно.")
             if symbol in brackets.keys():
                 stack.push(symbol)
             elif not stack.is_empty() and symbol == brackets[stack.peek()]:
@@ -219,9 +221,9 @@ class Expression:
 def execute_application():
     try:
         expression_1 = Expression("-8 - 3 * (-2) - 7 * (-6 - 3 * (-4))")
-        print(f"Выражение '{expression_1.infix_expression}' в постфиксной записи имеет вид:",
+        print(f"Выражение: {expression_1.infix_expression} в постфиксной записи имеет вид:",
               *expression_1.postfix_expression)
-        print(f"Выражение {expression_1.infix_expression} = {expression_1.get_expression_value()}")
+        print(f"Выражение: {expression_1.infix_expression} = {expression_1.get_expression_value()}")
     except (ExpressionValueError, BracketError) as e:
         print(e)
 
