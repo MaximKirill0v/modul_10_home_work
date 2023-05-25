@@ -3,6 +3,10 @@ class Node:
         self.data = data
         self.link = link
 
+    # str - строковое представление
+    def __str__(self):
+        return f"{self.data} -> {self.link}"
+
 
 """
 LinkedList или связный список – это структура данных. 
@@ -62,6 +66,11 @@ class LinkedList:
     def __len__(self):
         """ возвращает количество элементов в списке """
         return self.__length
+
+    # str - строковое представление
+    def __str__(self):
+        return f"{self.__head}"
+
 
     def items(self):
         """ возвращает итератор, который последовательно возвращает каждый элемент"""

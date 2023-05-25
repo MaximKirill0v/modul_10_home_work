@@ -24,3 +24,9 @@ class Deque:
     # len - возвращает количество элементов
     def __len__(self):
         return len(self.__data)
+
+    # str - строковое представление
+    def __str__(self):
+        return f"{self.__data}"
+
+
