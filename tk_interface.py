@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter.scrolledtext import ScrolledText
 
 
 def tk_interface():
@@ -8,7 +9,7 @@ def tk_interface():
         "Вывод количества пользователей в очереди", "Вывод всех пользователей в очереди")
 
     window = tk.Tk()
-    window.geometry(f"400x600")
+    window.geometry(f"400x500")
     window.title("Класс двусторонней очереди для работы с пользователями.")
     window.resizable(False, False)
 
@@ -43,6 +44,12 @@ def tk_interface():
     ent_log = tk.Entry(window, width=29)
     ent_log.grid(row=6, column=1, sticky='w', padx=5)
 
+    out = tk.Label(window, text="Вывод:")
+    out.grid(row=7, column=0, sticky='ws', padx=5)
+
+    out_res = ScrolledText(window, height=10, width=42)
+    out_res.grid(row=8, column=0, columnspan=2, padx=5)
+
     window.grid_rowconfigure(0, minsize=15)
     window.grid_rowconfigure(1, minsize=30)
     window.grid_rowconfigure(2, minsize=30)
@@ -50,6 +57,7 @@ def tk_interface():
     window.grid_rowconfigure(4, minsize=12)
     window.grid_rowconfigure(5, minsize=40)
     window.grid_rowconfigure(6, minsize=20)
+    window.grid_rowconfigure(7, minsize=30)
 
     window.grid_columnconfigure(0, minsize=100)
     window.grid_columnconfigure(1, minsize=100)
@@ -58,4 +66,5 @@ def tk_interface():
     window.grid_columnconfigure(4, minsize=100)
     window.grid_columnconfigure(5, minsize=100)
     window.grid_columnconfigure(6, minsize=100)
+
     window.mainloop()

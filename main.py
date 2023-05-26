@@ -1,4 +1,5 @@
 from tk_interface import tk_interface
+from data_structure.LinkedList import LinkedList, Node
 
 
 # Задание 1.
