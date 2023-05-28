@@ -5,7 +5,7 @@ class Node:
 
     # str - строковое представление
     def __str__(self):
-        return f"{self.data} -> {self.link}"
+        return f"{self.data}\n{self.link}"
 
 
 class LinkedList:
@@ -38,7 +38,7 @@ class LinkedList:
         return item
 
     def remove_last(self):
-        """ удаляет и возвращает последний элемент из конца списка """
+        """ Удаляет и возвращает последний элемент из конца списка """
         if self.__head.link is None:
             item = self.__head.data
             self.__head = self.__head.link
@@ -54,16 +54,15 @@ class LinkedList:
             return item
 
     def __len__(self):
-        """ возвращает количество элементов в списке """
+        """ Возвращает количество элементов в списке """
         return self.__length
 
     # str - строковое представление
     def __str__(self):
         return f"{self.__head}"
 
-
     def items(self):
-        """ возвращает итератор, который последовательно возвращает каждый элемент"""
+        """ Возвращает итератор, который последовательно возвращает каждый элемент"""
         if self.__head is not None:
             current_node = self.__head
             yield current_node.data

@@ -1,5 +1,4 @@
-from tk_interface import tk_interface
-from data_structure.LinkedList import LinkedList, Node
+from tk_interface import TkinterInterface
 
 
 # Задание 1.
@@ -17,7 +16,7 @@ from data_structure.LinkedList import LinkedList, Node
 # пользователь может выбрать необходимую операцию.
 
 def execute_application():
-    tk_interface()
+    TkinterInterface()
 
 
 if __name__ == '__main__':
