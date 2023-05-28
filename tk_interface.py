@@ -18,7 +18,7 @@ class TkinterInterface:
         self.label_length = tk.Label(self.window, text="Введите максимальный размер очереди:")
         self.label_length.grid(row=0, column=0, columnspan=2, sticky='ws', padx=5)
 
-        self.ent_length = tk.Entry(self.window)
+        self.ent_length = tk.Entry(self.window, justify=tk.RIGHT)
         self.ent_length.grid(row=1, column=0, sticky='wn', padx=5)
 
         self.btn_length = tk.Button(self.window, text="Подтвердить размер очереди", bd=2, command=self.clicked_btn_1)
