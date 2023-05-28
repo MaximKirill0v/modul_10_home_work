@@ -10,7 +10,7 @@ class TkinterInterface:
         self.deque = Deque()
         self.login_list = []
         self.window = tk.Tk()
-        self.window.geometry(f"400x370")
+        self.window.geometry(f"370x370")
 
         self.window.title("Класс двусторонней очереди для работы с пользователями.")
         self.window.resizable(False, False)
@@ -120,7 +120,7 @@ class TkinterInterface:
                 self.login_list.remove(remove_client[0])
                 self.out_res_lbl.configure(
                     text=f"Пользователь с логином '{remove_client[0]}' и паролем '{remove_client[1]}'\n"
-                         f"успешно удалён из начала очереди.")
+                         f"успешно удалён из начала очереди.", justify=tk.LEFT)
                 self.lbl_number_client.configure(text=f"Количество пользователей в очереди: {len(self.deque)}")
             else:
                 messagebox.showinfo("Внимание",
@@ -138,7 +138,7 @@ class TkinterInterface:
                 self.login_list.remove(remove_client[0])
                 self.out_res_lbl.configure(
                     text=f"Пользователь с логином '{remove_client[0]}' и паролем {remove_client[1]}\n"
-                         f"успешно удалён из конца очереди.")
+                         f"успешно удалён из конца очереди.", justify=tk.LEFT)
                 self.lbl_number_client.configure(text=f"Количество пользователей в очереди: {len(self.deque)}")
             else:
                 messagebox.showinfo("Внимание",
@@ -147,7 +147,8 @@ class TkinterInterface:
         elif self.combo.get() == "Вывод всех пользователей в очереди":
             if len(self.deque) == 0:
                 messagebox.showinfo("Все пользователи в очереди", f"Очередь пуста.")
-            messagebox.showinfo("Все пользователи в очереди", f"{self.deque}")
+            else:
+                messagebox.showinfo("Все пользователи в очереди", f"{self.deque}")
 
         elif self.combo.get() == "Вывод количества пользователей в очереди":
             messagebox.showinfo("Количество пользователей очереди", f"Количество пользователей: {len(self.deque)}")
@@ -177,7 +178,7 @@ class TkinterInterface:
                 else:
                     self.out_res_lbl.configure(
                         text=f"Пользователь с логином '{new_client[0]}' и паролем '{new_client[1]}'\n"
-                             f"успешно добавлен в начало очереди.")
+                             f"успешно добавлен в начало очереди.", justify=tk.LEFT)
                     self.deque.add_first(new_client)
                     self.lbl_number_client.configure(text=f"Количество пользователей в очереди: {len(self.deque)}")
                     self.login_list.append(log)
@@ -189,7 +190,7 @@ class TkinterInterface:
                 else:
                     self.out_res_lbl.configure(
                         text=f"Пользователь с логином '{new_client[0]}' и паролем '{new_client[1]}'\n"
-                             f"успешно добавлен в конец очереди.")
+                             f"успешно добавлен в конец очереди.", justify=tk.LEFT)
                     self.deque.add_last(new_client)
                     self.lbl_number_client.configure(text=f"Количество пользователей в очереди: {len(self.deque)}")
                     self.login_list.append(log)
