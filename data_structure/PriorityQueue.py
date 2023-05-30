@@ -1,13 +1,13 @@
-class BasketballPlayer:
-    def __init__(self, name: str, points: int):
-        self.__name = name
-        self.__points = points
+class ProblemBook:
+    def __init__(self, text: str, priority: int):
+        self.text = text
+        self.priority = priority
 
     def __lt__(self, other):
-        return self.__points < other.__points
+        return self.priority < other.priority
 
     def __str__(self):
-        return f"Имя баскетболиста: {self.__name}, Очков за игру: {self.__points}."
+        return f"Задача: {self.text}, Приоритет: {self.priority}."
 
 
 class PriorityQueue:
@@ -22,8 +22,8 @@ class PriorityQueue:
         return len(self.__queue) == 0
 
     # for inserting an element in the queue
-    def insert(self, name, points):
-        self.__queue.append(BasketballPlayer(name, points))
+    def insert(self, text, priority):
+        self.__queue.append(ProblemBook(text, priority))
         self.__queue.sort()
 
     # for popping an element based on max priority
