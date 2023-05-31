@@ -4,10 +4,10 @@ class ProblemBook:
         self.priority = priority
 
     def __lt__(self, other):
-        return self.priority < other.priority
+        return self.priority > other.priority
 
     def __str__(self):
-        return f"Задача: {self.text}, Приоритет: {self.priority}."
+        return f"Задача: {self.text}, Приоритет: {self.priority}.\n"
 
 
 class PriorityQueue:
@@ -26,6 +26,18 @@ class PriorityQueue:
         self.__queue.append(ProblemBook(text, priority))
         self.__queue.sort()
 
+    # возвращает первый элемент очереди
+    def first_element(self):
+        return self.__queue[0]
+
     # for popping an element based on max priority
     def delete(self):
         return self.__queue.pop().name
+
+    # возвращает итератор, который последовательно возвращает каждый элемент
+    def items_priority_queue(self):
+        for item in self.__queue:
+            yield item
+
+    def __len__(self):
+        return len(self.__queue)
