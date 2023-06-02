@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import ttk
 from tkinter import messagebox
 from data_structure.PriorityQueue import PriorityQueue
 
@@ -10,7 +9,7 @@ class TkinterInterface:
         self.task_list = []
         self.priority_deque = PriorityQueue()
         self.window = tk.Tk()
-        self.window.geometry(f"500x440")
+        self.window.geometry(f"500x500")
 
         self.window.title("Список задач.")
         self.window.resizable(False, False)
@@ -62,18 +61,25 @@ class TkinterInterface:
         self.lbl_line = tk.Label(self.window, text="---" * 30)
         self.lbl_line.grid(row=12, columnspan=2, pady=5)
 
-        self.btn_complete_task = tk.Button(self.window, text="Выполнить текущую задачу", bd=2, height=2)
+        self.btn_complete_task = tk.Button(self.window, text="Выполнить текущую задачу", bd=2, height=2,
+                                           command=self.complete_task)
         self.btn_complete_task.grid(row=13, column=0, sticky='we', padx=5, pady=15)
 
         self.btn_show_all_task = tk.Button(self.window, text="Показать список задач", bd=2, height=2,
                                            command=self.show_all_task)
         self.btn_show_all_task.grid(row=13, column=1, sticky='we', padx=5, pady=15)
 
-        self.lbl_current_task = tk.Label(self.window, text="Текущая задача: ")
-        self.lbl_current_task.grid(row=14, columnspan=2, sticky='w', padx=5)
+        self.lbl_complete_task = tk.Label(self.window, text="", height=2, anchor='w')
+        self.lbl_complete_task.grid(row=14, columnspan=2, sticky='w', padx=5)
 
-        self.lbl_current = tk.Label(self.window, text="")
-        self.lbl_current.grid(row=15, columnspan=2, sticky='w', padx=5)
+        self.lbl_current_task = tk.Label(self.window, text="Текущая задача: ")
+        self.lbl_current_task.grid(row=15, columnspan=2, sticky='w', padx=5)
+
+        self.lbl_current = tk.Label(self.window, text="", height=2, anchor='w')
+        self.lbl_current.grid(row=16, columnspan=2, sticky='w', padx=5)
+
+        self.btn_exit = tk.Button(self.window, text="Выход", bd=2, width=20, command=self.window.destroy)
+        self.btn_exit.grid(columnspan=2)
 
         self.window.mainloop()
 
@@ -96,33 +102,34 @@ class TkinterInterface:
             return
         if not self.validate_priority(self.ent_priority.get()) and (self.ent_task.get() or self.ent_priority.get()):
             messagebox.showinfo("Внимание!",
-                                "Приоритет задачи должен быть числом не меньшим нуля.")
+                                "Приоритет задачи должен быть натуральным числом не меньшим нуля.")
             return
         if self.repeat_check(self.ent_task.get()):
             messagebox.showinfo("Внимание!", f"Задача '{self.ent_task.get()}' уже есть в списке задач.")
             return
-        print(self.ent_priority.get())
         self.priority_deque.insert(self.ent_task.get(), int(self.ent_priority.get()))
         self.lbl_current.configure(text=f"{self.priority_deque.first_element()}")
         self.task_list.append(self.ent_task.get())
         self.lbl_out_task.configure(text=f"Задача '{self.ent_task.get()}' успешно добавлена в список задач.")
+        self.lbl_complete_task.configure(text="")
 
     def change_task(self):
         if not self.ent_change_task.get() or not self.ent_change_priority.get():
-            messagebox.showinfo("Внимание!", "Поля 'Введите задачу, приоритет "
-                                "которой хотите поменять' и 'Введите новый приоритет задачи' не должны быть пустыми.")
+            messagebox.showinfo("Внимание!", "Поля 'Введите задачу, приоритет которой хотите поменять' и 'Введите "
+                                             "новый приоритет задачи' не должны быть пустыми.")
             return
         if not self.validate_priority(self.ent_change_priority.get()) and (
                 self.ent_change_task.get() or self.ent_change_priority.get()):
             messagebox.showinfo("Внимание!",
-                                "Приоритет задачи должен быть числом не меньшим нуля.")
+                                "Приоритет задачи должен быть натуральным числом не меньшим нуля.")
             return
 
         found = False
         for task in self.priority_deque.items_priority_queue():
             if task.text == self.ent_change_task.get():
                 found = True
-                task.priority = self.ent_change_priority.get()
+                task.priority = int(self.ent_change_priority.get())
+                self.priority_deque.sort_priority_queue()
                 self.lbl_current.configure(text=f"{self.priority_deque.first_element()}")
                 self.lbl_out_change_task.configure(text=f"Значение приоритета задачи {self.ent_change_task.get()}"
                                                         f" успешно заменено на {self.ent_change_priority.get()}")
@@ -133,6 +140,62 @@ class TkinterInterface:
 
     def show_all_task(self):
         if not len(self.priority_deque):
-            messagebox.showinfo("Список задач.", "Список задач пустой!")
+            self.lbl_complete_task.configure(text="Список задач пуст, сначала добавьте задачу.")
         else:
-            messagebox.showinfo("Список задач", f"{self.priority_deque}")
+            CurrentTasksInterface(self.priority_deque)
+
+    def complete_task(self):
+        if not self.priority_deque.is_empty():
+            self.lbl_complete_task.configure(text=f"Задача '{self.priority_deque.first_element().text}' с приоритетом "
+                                                  f"{self.priority_deque.first_element().priority} выполнена.")
+            self.task_list.remove(self.priority_deque.first_element().text)
+            self.lbl_current.configure(text=f"{self.priority_deque.first_element()}")
+            self.priority_deque.delete()
+            if not self.priority_deque.is_empty():
+                self.lbl_current.configure(text=f"{self.priority_deque.first_element()}")
+            else:
+                self.lbl_current.configure(text="")
+        else:
+            self.lbl_complete_task.configure(text="Вы выполнили все задачи.")
+
+
+
+class CurrentTasksInterface:
+
+    def __init__(self, priority_deque: PriorityQueue):
+        self.__priority_deque = priority_deque
+
+        self.window = tk.Tk()
+        self.window.geometry()
+        self.window.title("Список текущих задач.")
+
+        self.lbl_current_priority_dis = tk.Label(self.window, text="Приоритет задачи", width=20)
+        self.lbl_current_priority_dis.grid(row=0, column=0)
+
+        self.lbl_line_dis = tk.Label(self.window, text="|", width=1)
+        self.lbl_line_dis.grid(row=0, column=1)
+
+        self.lbl_current_task_dis = tk.Label(self.window, text="Текущая задача", width=40)
+        self.lbl_current_task_dis.grid(row=0, column=2)
+
+        self.lbl_line_dis = tk.Label(self.window, text="---" * 30)
+        self.lbl_line_dis.grid(row=1, columnspan=3)
+
+        self.installation_lbl_task()
+
+        self.btn_return_tkinter_interface = tk.Button(self.window, text="Вернуться к списку задач", width=30, bd=2,
+                                                      command=self.window.destroy)
+        self.btn_return_tkinter_interface.grid(columnspan=3, pady=10)
+
+        self.window.mainloop()
+
+    def installation_lbl_task(self):
+        for row, task in enumerate(self.__priority_deque.items_priority_queue(), start=2):
+            lbl_current_priority = tk.Label(self.window, text=task.priority)
+            lbl_current_priority.grid(row=row, column=0)
+
+            lbl_line = tk.Label(self.window, text="|")
+            lbl_line.grid(row=row, column=1)
+
+            lbl_current_task = tk.Label(self.window, text=task.text)
+            lbl_current_task.grid(row=row, column=2)

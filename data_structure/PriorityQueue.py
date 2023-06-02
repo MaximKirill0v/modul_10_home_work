@@ -26,13 +26,16 @@ class PriorityQueue:
         self.__queue.append(ProblemBook(text, priority))
         self.__queue.sort()
 
+    def sort_priority_queue(self):
+        self.__queue.sort()
+
     # возвращает первый элемент очереди
     def first_element(self):
         return self.__queue[0]
 
     # for popping an element based on max priority
     def delete(self):
-        return self.__queue.pop().name
+        return self.__queue.pop(0)
 
     # возвращает итератор, который последовательно возвращает каждый элемент
     def items_priority_queue(self):

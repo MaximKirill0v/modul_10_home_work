@@ -1,5 +1,7 @@
 from data_structure.PriorityQueue import ProblemBook, PriorityQueue
 from tk_interface import TkinterInterface
+
+
 # Задание 1.
 # Создайте приложение используя очереди с приоритетом.
 # Представим что нужно спроектировать список задач. У каждой задачи
